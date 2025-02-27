@@ -14,7 +14,7 @@ resource "aws_subnet" "public-subnet-1" {
 
   #add custom tags
   tags = merge(var.tags, {
-    Name = "ToryBurch-public-subnet-2a"
+    Name = "ToryBurch-public-subnet-2a-parallel"
   })
 }
 
@@ -27,7 +27,7 @@ resource "aws_subnet" "private-subnet-1" {
 
   #add custom tags
   tags = merge(var.tags, {
-    Name = "ToryBurch-private-subnet-2a"
+    Name = "ToryBurch-private-subnet-2a-parallel"
   })
 }
 
@@ -36,7 +36,7 @@ resource "aws_internet_gateway" "igw" {
 
   #add custom tags
   tags = merge(var.tags, {
-    Name = "ToryBurch-igw"
+    Name = "ToryBurch-igw-parallel"
   })
 }
 
@@ -52,7 +52,7 @@ resource "aws_route_table" "public-route-table" {
   }
   #add custom tags
   tags = merge(var.tags, {
-    Name = "ToryBurch-public-route-table"
+    Name = "ToryBurch-public-route-table-parallel"
   })
 }
 
