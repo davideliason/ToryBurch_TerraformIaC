@@ -20,6 +20,6 @@ module "vpc" {
   cidr_block = "10.17.0.0/16"
 
   tags = {
-    Name = "ToryBurch-vpc"
+    Name = "ToryBurch-vpc-parallel"
   }
 }
