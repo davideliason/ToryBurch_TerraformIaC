@@ -20,7 +20,7 @@ resource "aws_subnet" "public-subnet-1" {
 
 resource "aws_subnet" "public-subnet-2" {
   vpc_id                  = aws_vpc.main-vpc.id
-  cidr_block              = cidrsubnet(aws_vpc.main-vpc.cidr_block, 4, 2) #10.16.32.0/20
+  cidr_block              = cidrsubnet(aws_vpc.main-vpc.cidr_block, 4, 2) #10.17.32.0/20
   availability_zone       = var.availability_zone-2
   map_public_ip_on_launch = var.map_public_ip_on_launch
 
@@ -40,6 +40,71 @@ resource "aws_subnet" "private-subnet-1" {
   #add custom tags
   tags = merge(var.tags, {
     Name = "ToryBurch-private-subnet-2a-parallel"
+  })
+}
+
+resource "aws_subnet" "private-subnet-2" {
+  vpc_id     = aws_vpc.main-vpc.id
+  cidr_block = cidrsubnet(aws_vpc.main-vpc.cidr_block, 4, 3) #10.17.48.0/20
+
+  availability_zone       = var.availability_zone-2
+  map_public_ip_on_launch = false
+
+  #add custom tags
+  tags = {
+    Name = "ToryBurch-private-subnet-2b"
+  }
+}
+
+resource "aws_instance" "web_server-1" {
+  ami                         = "ami-027951e78de46a00e" # Ubuntu 20.04 AMI 
+  instance_type               = "t2.micro"
+  subnet_id                   = aws_subnet.public-subnet-1.id
+  associate_public_ip_address = true
+  vpc_security_group_ids      = [aws_security_group.web_server_sg.id]
+  user_data                   = <<-EOF
+                                #!/bin/bash
+                                sudo yum update -y
+                                sudo yum install httpd -y
+                                sudo systemctl start httpd
+                                sudo bash -c 'echo Your very first web server > /var/www/html/index.html'
+                                EOF
+
+  tags = merge(var.tags, {
+    Name = "ToryBurch-web-server-1"
+  })
+}
+
+# create security group for web_server-1
+resource "aws_security_group" "web_server_sg" {
+  name        = "web_server_sg"
+  description = "Allow HTTP traffic"
+  vpc_id      = aws_vpc.main-vpc.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  #add port 22
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(var.tags, {
+    Name = "ToryBurch-web-server-sg"
   })
 }
 
